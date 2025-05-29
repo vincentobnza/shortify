@@ -12,14 +12,22 @@ export function Stats() {
     totalClicks: 0,
     averageClicks: 0,
   });
-
   useEffect(() => {
     if (urlList.length > 0) {
-      const totalClicks = urlList.reduce((acc, url) => acc + url.clicks, 0);
+      const totalClicks = urlList.reduce(
+        (acc, url) => acc + (url.clicks || 0),
+        0
+      );
       setStats({
         totalUrls: urlList.length,
         totalClicks,
-        averageClicks: totalClicks / urlList.length,
+        averageClicks: urlList.length > 0 ? totalClicks / urlList.length : 0,
+      });
+    } else {
+      setStats({
+        totalUrls: 0,
+        totalClicks: 0,
+        averageClicks: 0,
       });
     }
   }, [urlList]);
@@ -41,7 +49,9 @@ export function Stats() {
           </CardTitle>
         </CardHeader>
         <CardContent>
-          <div className="text-2xl font-bold">{stats.totalUrls}</div>
+          <div className="text-2xl md:text-3xl font-bold">
+            {stats.totalUrls}
+          </div>
         </CardContent>
       </Card>
       <Card>
@@ -51,7 +61,9 @@ export function Stats() {
           </CardTitle>
         </CardHeader>
         <CardContent>
-          <div className="text-2xl font-bold">{stats.totalClicks}</div>
+          <div className="text-2xl md:text-3xl font-bold">
+            {stats.totalClicks}
+          </div>
         </CardContent>
       </Card>
       <Card>
@@ -61,7 +73,7 @@ export function Stats() {
           </CardTitle>
         </CardHeader>
         <CardContent>
-          <div className="text-2xl font-bold">
+          <div className="text-2xl md:text-3xl font-bold">
             {stats.averageClicks.toFixed(1)}
           </div>
         </CardContent>

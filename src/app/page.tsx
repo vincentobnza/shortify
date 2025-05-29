@@ -15,12 +15,12 @@ import {
 } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { ModeToggle } from "@/components/mode-toggle";
 import { useUrlStore } from "@/store/url-store";
 import { Stats } from "@/components/stats";
-import { AboutDialog } from "@/components/about-dialog";
 import Footer from "./footer";
 import UrlList from "./url-list";
+import Header from "./header";
+import Image from "next/image";
 
 interface FormData {
   url: string;
@@ -67,36 +67,20 @@ export default function Home() {
   };
 
   return (
-    <div className="w-full max-w-screen-xl mx-auto p-5 min-h-screen">
+    <div className="w-full max-w-screen-lg mx-auto p-5 min-h-screen">
       {/* Header */}
-      <header className="container flex items-center justify-between">
-        <div className="flex items-center gap-2">
-          <svg
-            xmlns="http://www.w3.org/2000/svg"
-            width="24"
-            height="24"
-            viewBox="0 0 24 24"
-            fill="none"
-            stroke="currentColor"
-            strokeWidth="2"
-            strokeLinecap="round"
-            strokeLinejoin="round"
-            className="text-primary"
-          >
-            <path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"></path>
-            <path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"></path>
-          </svg>
-          <h1 className="text-xl font-bold">Shortify</h1>
-        </div>
-        <div className="flex items-center gap-2">
-          <AboutDialog />
-          <ModeToggle />
-        </div>
-      </header>
+      <Header />
 
       {/* Main Content */}
-      <main className="container py-6 space-y-12">
-        <section className="text-center space-y-4 py-12">
+      <main className="container py-6 space-y-6">
+        <section className="flex flex-col justify-center text-center space-y-4 py-8">
+          <Image
+            src="/link_image.png"
+            alt="shortify logo"
+            width={150}
+            height={150}
+            className="mx-auto mb-4"
+          />
           <h1 className="text-4xl sm:text-5xl font-bold">Shorten your URLs</h1>
           <p className="text-muted-foreground text-lg max-w-2xl mx-auto">
             Create short, memorable links that redirect to your long URLs. Track
@@ -105,7 +89,7 @@ export default function Home() {
         </section>
 
         {/* Stats Display */}
-        <div className="max-w-3xl mx-auto mb-8">
+        <div className="max-w-3xl mx-auto">
           <Stats />
         </div>
 

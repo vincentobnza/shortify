@@ -1,7 +1,7 @@
 export default function Footer() {
   return (
-    <footer className="border-t py-6 mt-12">
-      <div className="container flex flex-col items-center justify-between gap-4 md:flex-row">
+    <footer className="w-full max-w-screen-lg mx-auto border-t py-6 mt-12">
+      <div className="flex flex-col items-center justify-between gap-4 md:flex-row">
         <p className="text-sm text-muted-foreground">
           © 2025 Shortify. All rights reserved.
         </p>
