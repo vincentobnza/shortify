@@ -20,6 +20,7 @@ import { useUrlStore } from "@/store/url-store";
 import { Stats } from "@/components/stats";
 import { AboutDialog } from "@/components/about-dialog";
 import Footer from "./footer";
+import UrlList from "./url-list";
 
 interface FormData {
   url: string;
@@ -66,7 +67,7 @@ export default function Home() {
   };
 
   return (
-    <div className="w-full max-w-screen-xl mx-auto p-5 min-h-screen bg-background">
+    <div className="w-full max-w-screen-xl mx-auto p-5 min-h-screen">
       {/* Header */}
       <header className="container flex items-center justify-between">
         <div className="flex items-center gap-2">
@@ -183,70 +184,8 @@ export default function Home() {
         </Card>
 
         {/* URL List */}
-        {urlList.length > 0 && (
-          <section className="max-w-3xl mx-auto">
-            <h2 className="text-2xl font-bold mb-4">Your Links</h2>
-            <div className="space-y-4">
-              {urlList.map((url) => (
-                <Card key={url.id}>
-                  <CardContent>
-                    <div className="grid gap-4">
-                      <div className="grid grid-cols-[1fr_auto] gap-2 items-center">
-                        <div className="truncate">
-                          <p className="text-sm font-medium mb-1">
-                            {window?.location?.origin}/{url.short_id}
-                          </p>
-                          <p className="text-sm text-muted-foreground truncate">
-                            {url.original_url}
-                          </p>
-                        </div>
-                        <div className="flex items-center gap-2">
-                          <Button
-                            size="sm"
-                            variant="ghost"
-                            className="h-8 px-2"
-                            onClick={() =>
-                              handleCopy(
-                                `${window?.location?.origin}/${url.short_id}`,
-                                url.id
-                              )
-                            }
-                          >
-                            <Copy
-                              className={`h-4 w-4 ${
-                                copied === url.id ? "text-green-500" : ""
-                              }`}
-                            />
-                            <span className="sr-only">Copy</span>
-                          </Button>
-                          <Button
-                            size="sm"
-                            variant="ghost"
-                            className="h-8 px-2"
-                            asChild
-                          >
-                            <a
-                              href={`/${url.short_id}`}
-                              target="_blank"
-                              rel="noopener noreferrer"
-                            >
-                              <ExternalLink className="h-4 w-4" />
-                              <span className="sr-only">Open</span>
-                            </a>
-                          </Button>
-                        </div>
-                      </div>
-                      <div className="text-xs text-muted-foreground">
-                        {url.clicks} {url.clicks === 1 ? "click" : "clicks"} •
-                        Created {new Date(url.created_at).toLocaleDateString()}
-                      </div>
-                    </div>
-                  </CardContent>
-                </Card>
-              ))}
-            </div>
-          </section>
-        )}
+
+        <UrlList urlList={urlList} copied={copied} handleCopy={handleCopy} />
       </main>
 
       {/* Footer */}
