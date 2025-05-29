@@ -41,7 +41,7 @@ export const useUrlStore = create<UrlState>((set, get) => ({
     // Validate URL
     try {
       new URL(originalUrl);
-    } catch (e) {
+    } catch {
       set({
         error: "Please enter a valid URL including http:// or https://",
         isLoading: false,
@@ -55,7 +55,7 @@ export const useUrlStore = create<UrlState>((set, get) => ({
       const shortId = nanoid(8); // Generate an 8-character short ID
 
       // Store in Supabase
-      const { data, error } = await supabase
+      const { error } = await supabase
         .from("urls")
         .insert([{ original_url: originalUrl, short_id: shortId, clicks: 0 }])
         .select();
