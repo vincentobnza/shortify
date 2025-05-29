@@ -1,102 +1,274 @@
-import Image from "next/image";
+"use client";
+
+import { useState, useEffect } from "react";
+import { useForm } from "react-hook-form";
+import { Copy, ExternalLink } from "lucide-react";
+import { toast } from "sonner";
+import { Button } from "@/components/ui/button";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardFooter,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { ModeToggle } from "@/components/mode-toggle";
+import { useUrlStore } from "@/store/url-store";
+import { Stats } from "@/components/stats";
+import { AboutDialog } from "@/components/about-dialog";
+
+interface FormData {
+  url: string;
+}
 
 export default function Home() {
-  return (
-    <div className="grid grid-rows-[20px_1fr_20px] items-center justify-items-center min-h-screen p-8 pb-20 gap-16 sm:p-20 font-[family-name:var(--font-geist-sans)]">
-      <main className="flex flex-col gap-[32px] row-start-2 items-center sm:items-start">
-        <Image
-          className="dark:invert"
-          src="/next.svg"
-          alt="Next.js logo"
-          width={180}
-          height={38}
-          priority
-        />
-        <ol className="list-inside list-decimal text-sm/6 text-center sm:text-left font-[family-name:var(--font-geist-mono)]">
-          <li className="mb-2 tracking-[-.01em]">
-            Get started by editing{" "}
-            <code className="bg-black/[.05] dark:bg-white/[.06] px-1 py-0.5 rounded font-[family-name:var(--font-geist-mono)] font-semibold">
-              src/app/page.tsx
-            </code>
-            .
-          </li>
-          <li className="tracking-[-.01em]">
-            Save and see your changes instantly.
-          </li>
-        </ol>
+  const {
+    register,
+    handleSubmit,
+    formState: { errors },
+    reset,
+  } = useForm<FormData>();
+  const {
+    shortUrl,
+    isLoading,
+    error,
+    urlList,
+    fetchAllUrls,
+    setOriginalUrl,
+    generateShortUrl,
+    copyToClipboard,
+  } = useUrlStore();
+  const [copied, setCopied] = useState<string | null>(null);
 
-        <div className="flex gap-4 items-center flex-col sm:flex-row">
-          <a
-            className="rounded-full border border-solid border-transparent transition-colors flex items-center justify-center bg-foreground text-background gap-2 hover:bg-[#383838] dark:hover:bg-[#ccc] font-medium text-sm sm:text-base h-10 sm:h-12 px-4 sm:px-5 sm:w-auto"
-            href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
+  useEffect(() => {
+    fetchAllUrls();
+  }, [fetchAllUrls]);
+
+  const onSubmit = async (data: FormData) => {
+    setOriginalUrl(data.url);
+    await generateShortUrl();
+    reset();
+  };
+
+  const handleCopy = async (text: string, id: string) => {
+    const success = await copyToClipboard(text);
+    if (success) {
+      setCopied(id);
+      toast.success("URL copied to clipboard");
+      setTimeout(() => setCopied(null), 2000);
+    } else {
+      toast.error("Failed to copy URL");
+    }
+  };
+
+  return (
+    <div className="w-full max-w-screen-xl mx-auto p-5 min-h-screen bg-background">
+      {/* Header */}
+      <header className="container flex items-center justify-between">
+        <div className="flex items-center gap-2">
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            width="24"
+            height="24"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            strokeWidth="2"
+            strokeLinecap="round"
+            strokeLinejoin="round"
+            className="text-primary"
           >
-            <Image
-              className="dark:invert"
-              src="/vercel.svg"
-              alt="Vercel logomark"
-              width={20}
-              height={20}
-            />
-            Deploy now
-          </a>
-          <a
-            className="rounded-full border border-solid border-black/[.08] dark:border-white/[.145] transition-colors flex items-center justify-center hover:bg-[#f2f2f2] dark:hover:bg-[#1a1a1a] hover:border-transparent font-medium text-sm sm:text-base h-10 sm:h-12 px-4 sm:px-5 w-full sm:w-auto md:w-[158px]"
-            href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Read our docs
-          </a>
+            <path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"></path>
+            <path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"></path>
+          </svg>
+          <h1 className="text-xl font-bold">Shortify</h1>
         </div>
+        <div className="flex items-center gap-2">
+          <AboutDialog />
+          <ModeToggle />
+        </div>
+      </header>
+
+      {/* Main Content */}
+      <main className="container py-6 space-y-12">
+        <section className="text-center space-y-4 py-12">
+          <h1 className="text-4xl sm:text-5xl font-bold">Shorten your URLs</h1>
+          <p className="text-muted-foreground text-lg max-w-2xl mx-auto">
+            Create short, memorable links that redirect to your long URLs. Track
+            clicks and share your links easily.
+          </p>
+        </section>
+
+        {/* Stats Display */}
+        <div className="max-w-3xl mx-auto mb-8">
+          <Stats />
+        </div>
+
+        {/* URL Shortener Form */}
+        <Card className="max-w-3xl mx-auto">
+          <CardHeader>
+            <CardTitle>Create Short URL</CardTitle>
+            <CardDescription>
+              Enter a long URL to generate a short link
+            </CardDescription>
+          </CardHeader>
+          <form onSubmit={handleSubmit(onSubmit)}>
+            <CardContent>
+              <div className="grid gap-4">
+                <div className="grid gap-2">
+                  <Label htmlFor="url">URL</Label>
+                  <div className="flex gap-2">
+                    <Input
+                      id="url"
+                      placeholder="https://example.com/very-long-url"
+                      className="flex-1"
+                      {...register("url", {
+                        required: "URL is required",
+                        pattern: {
+                          value:
+                            /^(https?:\/\/)?([\da-z\.-]+)\.([a-z\.]{2,6})([\/\w \.-]*)*\/?$/,
+                          message: "Please enter a valid URL",
+                        },
+                      })}
+                    />
+                    <Button
+                      type="submit"
+                      disabled={isLoading}
+                      className="text-white"
+                    >
+                      {isLoading ? "Shortening..." : "Shorten"}
+                    </Button>
+                  </div>
+                  {errors.url && (
+                    <p className="text-sm text-destructive">
+                      {errors.url.message}
+                    </p>
+                  )}
+                  {error && <p className="text-sm text-destructive">{error}</p>}
+                </div>
+              </div>
+            </CardContent>
+          </form>
+
+          {shortUrl && (
+            <CardFooter className="flex flex-col items-start gap-4 border-t pt-4">
+              <div className="flex flex-col w-full gap-2">
+                <Label>Your shortened URL</Label>
+                <div className="flex items-center gap-2">
+                  <Input value={shortUrl} readOnly className="flex-1" />
+                  <Button
+                    size="icon"
+                    variant="outline"
+                    onClick={() => handleCopy(shortUrl, "current")}
+                  >
+                    <Copy className="h-4 w-4" />
+                  </Button>
+                  <Button size="icon" variant="outline" asChild>
+                    <a
+                      href={shortUrl}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                    >
+                      <ExternalLink className="h-4 w-4" />
+                    </a>
+                  </Button>
+                </div>
+              </div>
+            </CardFooter>
+          )}
+        </Card>
+
+        {/* URL List */}
+        {urlList.length > 0 && (
+          <section className="max-w-3xl mx-auto">
+            <h2 className="text-2xl font-bold mb-4">Your Links</h2>
+            <div className="space-y-4">
+              {urlList.map((url) => (
+                <Card key={url.id}>
+                  <CardContent>
+                    <div className="grid gap-4">
+                      <div className="grid grid-cols-[1fr_auto] gap-2 items-center">
+                        <div className="truncate">
+                          <p className="text-sm font-medium mb-1">
+                            {window?.location?.origin}/{url.short_id}
+                          </p>
+                          <p className="text-sm text-muted-foreground truncate">
+                            {url.original_url}
+                          </p>
+                        </div>
+                        <div className="flex items-center gap-2">
+                          <Button
+                            size="sm"
+                            variant="ghost"
+                            className="h-8 px-2"
+                            onClick={() =>
+                              handleCopy(
+                                `${window?.location?.origin}/${url.short_id}`,
+                                url.id
+                              )
+                            }
+                          >
+                            <Copy
+                              className={`h-4 w-4 ${
+                                copied === url.id ? "text-green-500" : ""
+                              }`}
+                            />
+                            <span className="sr-only">Copy</span>
+                          </Button>
+                          <Button
+                            size="sm"
+                            variant="ghost"
+                            className="h-8 px-2"
+                            asChild
+                          >
+                            <a
+                              href={`/${url.short_id}`}
+                              target="_blank"
+                              rel="noopener noreferrer"
+                            >
+                              <ExternalLink className="h-4 w-4" />
+                              <span className="sr-only">Open</span>
+                            </a>
+                          </Button>
+                        </div>
+                      </div>
+                      <div className="text-xs text-muted-foreground">
+                        {url.clicks} {url.clicks === 1 ? "click" : "clicks"} •
+                        Created {new Date(url.created_at).toLocaleDateString()}
+                      </div>
+                    </div>
+                  </CardContent>
+                </Card>
+              ))}
+            </div>
+          </section>
+        )}
       </main>
-      <footer className="row-start-3 flex gap-[24px] flex-wrap items-center justify-center">
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="/file.svg"
-            alt="File icon"
-            width={16}
-            height={16}
-          />
-          Learn
-        </a>
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="/window.svg"
-            alt="Window icon"
-            width={16}
-            height={16}
-          />
-          Examples
-        </a>
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://nextjs.org?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="/globe.svg"
-            alt="Globe icon"
-            width={16}
-            height={16}
-          />
-          Go to nextjs.org →
-        </a>
+
+      {/* Footer */}
+      <footer className="border-t py-6 mt-12">
+        <div className="container flex flex-col items-center justify-between gap-4 md:flex-row">
+          <p className="text-sm text-muted-foreground">
+            © 2025 Shortify. All rights reserved.
+          </p>
+          <div className="flex items-center gap-4">
+            <a
+              href="#"
+              className="text-sm text-muted-foreground hover:underline"
+            >
+              Terms of Service
+            </a>
+            <a
+              href="#"
+              className="text-sm text-muted-foreground hover:underline"
+            >
+              Privacy Policy
+            </a>
+          </div>
+        </div>
       </footer>
     </div>
   );
