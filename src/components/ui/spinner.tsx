@@ -15,7 +15,7 @@ export function Spinner({ size = "md", className }: SpinnerProps) {
           "h-6 w-6": size === "md",
           "h-8 w-8": size === "lg",
         },
-        "text-primary",
+        "text-indigo-600",
         className
       )}
       role="status"
