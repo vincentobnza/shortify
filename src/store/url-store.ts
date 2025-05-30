@@ -14,6 +14,7 @@ interface UrlState {
   fetchAllUrls: () => Promise<void>;
   copyToClipboard: (text: string) => Promise<boolean>;
   resetState: () => void;
+  deleteUrl: (id: string) => Promise<void>;
 }
 
 export interface UrlEntry {
@@ -119,4 +120,20 @@ export const useUrlStore = create<UrlState>((set, get) => ({
       shortUrl: "",
       error: null,
     }),
+
+  deleteUrl: async (id) => {
+    set({ isLoading: true, error: null });
+
+    try {
+      const { error } = await supabase.from("urls").delete().eq("id", id);
+      if (error) throw error;
+      get().fetchAllUrls();
+    } catch (error: unknown) {
+      set({
+        error:
+          error instanceof Error ? error.message : "An unknown error occurred",
+        isLoading: false,
+      });
+    }
+  },
 }));
