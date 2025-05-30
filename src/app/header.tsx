@@ -1,7 +1,14 @@
+"use client"
+
+
 import { ModeToggle } from "@/components/mode-toggle";
+import { SignedIn, SignedOut, SignInButton, UserButton } from "@clerk/nextjs";
 import Link from "next/link";
+import { dark, neobrutalism } from "@clerk/themes";
+import { useTheme } from "next-themes";
 
 export default function Header() {
+  const { theme } = useTheme();
   const links = [
     {
       name: "Home",
@@ -33,6 +40,18 @@ export default function Header() {
           ))}
         </ul>
         <ModeToggle />
+        <>
+          <SignedIn>
+            <UserButton
+              appearance={{
+                baseTheme: theme === "dark" || "system" ? dark : neobrutalism,
+              }}
+            />
+          </SignedIn>
+          <SignedOut>
+            <SignInButton />
+          </SignedOut>
+        </>
       </div>
     </header>
   );

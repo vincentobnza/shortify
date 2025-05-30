@@ -1,12 +1,25 @@
 import { NextResponse } from "next/server";
-import type { NextRequest } from "next/server";
 import { supabase } from "@/lib/supabase";
+import { clerkMiddleware, createRouteMatcher } from "@clerk/nextjs/server";
 
-const APP_ROUTES = ["/about"];
+const APP_ROUTES = ["/about", "/sign-in", "/sign-up"];
 
-export async function middleware(request: NextRequest) {
-  const path = request.nextUrl.pathname;
+// Define public routes (routes that don't require authentication)
+const isPublicRoute = createRouteMatcher([
+  "/sign-in(.*)",
+  "/sign-up(.*)",
+  "/about",
+]);
 
+export default clerkMiddleware(async (auth, req) => {
+  const path = req.nextUrl.pathname;
+
+  // Handle Clerk authentication first
+  if (!isPublicRoute(req)) {
+    await auth.protect();
+  }
+
+  // Skip processing for Next.js internal routes, API routes, static files, and app routes
   if (
     path.startsWith("/_next") ||
     path.startsWith("/api") ||
@@ -30,35 +43,38 @@ export async function middleware(request: NextRequest) {
 
     if (error || !data) {
       // Short URL not found, redirect to home page
-      return NextResponse.redirect(new URL("/", request.url));
+      return NextResponse.redirect(new URL("/", req.url));
     }
 
     // Increment the click count in the background
-    (async () => {
-      try {
-        await supabase
-          .from("urls")
-          .update({
-            clicks: supabase.rpc("increment_clicks", { row_id: shortId }),
-          })
-          .eq("short_id", shortId);
+    // Note: This async operation might not complete before the redirect
+    Promise.resolve(
+      supabase
+        .from("urls")
+        .update({
+          clicks: supabase.rpc("increment_clicks", { row_id: shortId }),
+        })
+        .eq("short_id", shortId)
+    )
+      .then(() => {
         console.log(`Incremented click count for ${shortId}`);
-      } catch (error: unknown) {
+      })
+      .catch((error) => {
         if (error instanceof Error) {
-          console.error(`Failed to increment click count: ${error.message}`);
+          console.error("Error incrementing click count:", error);
         }
-      }
-    })();
+      });
 
-    // Redirect to the original URL
     return NextResponse.redirect(new URL(data.original_url));
   } catch (error) {
     console.error("Error in middleware:", error);
-    // If there's an error, redirect to home
-    return NextResponse.redirect(new URL("/", request.url));
+    return NextResponse.redirect(new URL("/", req.url));
   }
-}
+});
 
 export const config = {
-  matcher: "/:path*",
+  matcher: [
+    "/((?!_next|[^?]*\\.(?:html?|css|js(?!on)|jpe?g|webp|png|gif|svg|ttf|woff2?|ico|csv|docx?|xlsx?|zip|webmanifest)).*)",
+    "/(api|trpc)(.*)",
+  ],
 };

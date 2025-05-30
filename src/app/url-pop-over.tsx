@@ -52,10 +52,7 @@ export function URLPopover({ handleCopy, url }: URLPopoverProps) {
         <div className="space-y-1 p-1">
           <Button
             onClick={() =>
-              handleOpenAndClose(
-                `${window?.location?.origin}/${url.short_id}`,
-                url.id
-              )
+              window.open(`${window?.location?.origin}/${url.short_id}`)
             }
             variant="ghost"
             className="w-full justify-start gap-3 text-sm"

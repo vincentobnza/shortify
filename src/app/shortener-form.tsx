@@ -1,3 +1,5 @@
+"use client";
+
 import { Button } from "@/components/ui/button";
 import {
   Card,
@@ -11,6 +13,8 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Copy, ExternalLink, Scissors } from "lucide-react";
 import { useForm } from "react-hook-form";
+import { useAuth } from "@clerk/nextjs";
+import { useRouter } from "next/navigation";
 
 type FormValues = {
   url: string;
@@ -37,8 +41,14 @@ export default function ShortenerForm({
     formState: { errors },
     reset,
   } = useForm<FormValues>();
+  const { isSignedIn } = useAuth();
+  const router = useRouter();
 
   const onSubmit = async (data: FormValues) => {
+    if (!isSignedIn) {
+      router.push("/sign-in");
+      return;
+    }
     await onUrlSubmit(data.url);
     reset();
   };
