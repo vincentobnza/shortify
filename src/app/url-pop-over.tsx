@@ -8,7 +8,7 @@ import {
   PopoverContent,
   PopoverTrigger,
 } from "@/components/ui/popover";
-import { Copy, EllipsisVertical } from "lucide-react";
+import { Copy, EllipsisVertical, Globe } from "lucide-react";
 import { useState } from "react";
 import { useUrlStore } from "@/store/url-store";
 import { toast } from "sonner";
@@ -50,6 +50,19 @@ export function URLPopover({ handleCopy, url }: URLPopoverProps) {
       </PopoverTrigger>
       <PopoverContent className="w-48 p-0" align="end">
         <div className="space-y-1 p-1">
+          <Button
+            onClick={() =>
+              handleOpenAndClose(
+                `${window?.location?.origin}/${url.short_id}`,
+                url.id
+              )
+            }
+            variant="ghost"
+            className="w-full justify-start gap-3 text-sm"
+          >
+            <Globe className="h-4 w-4" />
+            Open
+          </Button>
           <Button
             onClick={() =>
               handleOpenAndClose(
