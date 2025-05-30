@@ -1,6 +1,5 @@
-import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
-import { Copy, ExternalLink } from "lucide-react";
+import { URLPopover } from "@/app/url-pop-over";
 
 type UrlListProps = {
   urlList: {
@@ -33,40 +32,12 @@ export default function UrlList({ urlList, copied, handleCopy }: UrlListProps) {
                           {url.original_url}
                         </p>
                       </div>
-                      <div className="flex items-center gap-2">
-                        <Button
-                          size="sm"
-                          variant="ghost"
-                          className="h-8 px-2"
-                          onClick={() =>
-                            handleCopy(
-                              `${window?.location?.origin}/${url.short_id}`,
-                              url.id
-                            )
-                          }
-                        >
-                          <Copy
-                            className={`h-4 w-4 ${
-                              copied === url.id ? "text-green-500" : ""
-                            }`}
-                          />
-                          <span className="sr-only">Copy</span>
-                        </Button>
-                        <Button
-                          size="sm"
-                          variant="ghost"
-                          className="h-8 px-2"
-                          asChild
-                        >
-                          <a
-                            href={`/${url.short_id}`}
-                            target="_blank"
-                            rel="noopener noreferrer"
-                          >
-                            <ExternalLink className="h-4 w-4" />
-                            <span className="sr-only">Open</span>
-                          </a>
-                        </Button>
+                      <div className="flex">
+                        <URLPopover
+                          handleCopy={handleCopy}
+                          url={{ id: url.id, short_id: url.short_id }}
+                          copied={copied}
+                        />
                       </div>
                     </div>
                     <div className="text-xs text-muted-foreground">
