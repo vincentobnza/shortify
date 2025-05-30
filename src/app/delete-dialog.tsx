@@ -45,7 +45,7 @@ export function DeleteDialog({ onDelete, shortId }: DeleteDialogProps) {
           <DialogTitle>Are you absolutely sure?</DialogTitle>
           <DialogDescription>
             This will permanently delete the shortened URL{" "}
-            <code>{shortId}</code> and all its click data. This action cannot be
+            <code>{shortId}</code> and all its data. This action cannot be
             undone.
           </DialogDescription>
         </DialogHeader>
