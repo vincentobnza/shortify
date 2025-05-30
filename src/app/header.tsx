@@ -15,7 +15,9 @@ export default function Header() {
   return (
     <header className="container flex items-center justify-between">
       <div className="flex items-center gap-2">
-        <h1 className="text-xl font-bold">Shortify</h1>
+        <Link href="/" className="text-xl font-bold">
+          Shortify
+        </Link>
       </div>
       <div className="flex items-center space-x-8">
         <ul className="space-x-8">
