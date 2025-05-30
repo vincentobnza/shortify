@@ -2,15 +2,17 @@ import { NextResponse } from "next/server";
 import type { NextRequest } from "next/server";
 import { supabase } from "@/lib/supabase";
 
+const APP_ROUTES = ["/about"];
+
 export async function middleware(request: NextRequest) {
   const path = request.nextUrl.pathname;
 
-  // Skip API routes, static files, and the root path
   if (
     path.startsWith("/_next") ||
     path.startsWith("/api") ||
     path.includes(".") ||
-    path === "/"
+    path === "/" ||
+    APP_ROUTES.some((route) => path === route || path.startsWith(`${route}/`))
   ) {
     return NextResponse.next();
   }

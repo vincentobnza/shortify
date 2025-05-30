@@ -24,7 +24,7 @@ export default function RootLayout({
   return (
     <html lang="en" suppressHydrationWarning>
       <body
-        className={`${outfit.className} antialiased bg-white dark:bg-zinc-900`}
+        className={`${outfit.className} antialiased bg-white dark:bg-gradient-to-b from-zinc-800 dark:to-zinc-950 dark:shadow-[2px_4px_16px_0px_rgba(248,248,248,0.06)_inset]`}
       >
         <ThemeProvider
           attribute="class"
